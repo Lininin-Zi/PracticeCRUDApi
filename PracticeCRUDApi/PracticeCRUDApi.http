@@ -1,0 +1,6 @@
+@PracticeCRUDApi_HostAddress = http://localhost:5192
+
+GET {{PracticeCRUDApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
