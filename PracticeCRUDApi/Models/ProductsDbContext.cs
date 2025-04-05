@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-//whyyyy
-
 namespace PracticeCRUDApi.Models
 {
     public class ProductsDbContext: DbContext

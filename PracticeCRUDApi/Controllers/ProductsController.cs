@@ -19,19 +19,24 @@ namespace PracticeCRUDApi.Controllers
 
         // GET: api/<ProductsController>
         [HttpGet]
+        //非同步處理(async Task<ActionResult<>> 及 await)
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
-            // 模擬非同步動作（例如從資料庫讀資料）
-            //await Task.Delay(100); // 模擬一下延遲
-
             return await _context.Products.ToListAsync();
         }
 
         // GET api/<ProductsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return "value";
+            var Product = await _context.Products.FindAsync(id);
+            //如果沒有找到就return NotFound
+            if (Product == null)
+            {
+                return NotFound();
+            }
+            //有找就return OK message&data
+            return Ok(Product);
         }
 
         // POST api/<ProductsController>
