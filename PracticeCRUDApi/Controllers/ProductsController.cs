@@ -10,8 +10,9 @@ namespace PracticeCRUDApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        //依賴注入
+        //依賴注入的資料庫物件
         private readonly ProductsDbContext _context;
+        //建構子,依賴注入資料庫物件
         public ProductsController(ProductsDbContext context)
         {
             _context = context;
@@ -41,9 +42,16 @@ namespace PracticeCRUDApi.Controllers
 
         // POST api/<ProductsController>
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-
+            // 設置創建時間為當前 UTC 時間
+            product.CreatedAt = DateTime.UtcNow;
+            //將product加入到資料庫物件的list中
+            _context.Products.Add(product);
+            //實際將product寫入資料庫,以非同步方法執行,搭配await
+            await _context.SaveChangesAsync();
+            // 返回 201 Created 狀態碼，並在響應頭中包含新產品的 URL
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 
         // PUT api/<ProductsController>/5
