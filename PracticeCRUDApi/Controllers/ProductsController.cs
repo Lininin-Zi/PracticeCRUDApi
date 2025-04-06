@@ -18,6 +18,7 @@ namespace PracticeCRUDApi.Controllers
             _context = context;
         }
 
+        //查詢所有產品資料的API
         // GET: api/<ProductsController>
         [HttpGet]
         //非同步處理(async Task<ActionResult<>> 及 await)
@@ -26,6 +27,7 @@ namespace PracticeCRUDApi.Controllers
             return await _context.Products.ToListAsync();
         }
 
+        //查詢特定ID產品的API
         // GET api/<ProductsController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
@@ -40,6 +42,7 @@ namespace PracticeCRUDApi.Controllers
             return Ok(Product);
         }
 
+        //新增產品的API
         // POST api/<ProductsController>
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
@@ -54,17 +57,75 @@ namespace PracticeCRUDApi.Controllers
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 
+        //更新特定ID產品資料的API
         // PUT api/<ProductsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<ActionResult<Product>> UpdateProduct(int id, Product product)
         {
+            //檢查ID是否一致，是否需要確認ID?
+            if(id != product.Id)
+            {
+                return BadRequest();
+            }
+            //檢查資料庫中是否有此ID的產品
+            var existingProduct = await _context.Products.FindAsync(id);
+
+            //如果沒有找到就return NotFound
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            //更新產品資料
+            existingProduct.Name = product.Name;
+            existingProduct.Description = product.Description;
+            existingProduct.Price = product.Price;
+            existingProduct.Stock = product.Stock;
+            existingProduct.ImageUrl = product.ImageUrl;
+            //更新時間戳記
+            existingProduct.UpdatedAt = DateTime.UtcNow;
+
+            //將資料更新至資料庫，並檢查是否有衝突
+            //不確定這個方法是否有用，待測試
+            try
+            {
+                // 保存更改到數據庫
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // 檢查產品是否存在
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            //return 204 no content訊息，不回傳內容
+            return NoContent();
         }
+
 
         // DELETE api/<ProductsController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
 
+        }
+        
+
+
+
+
+        
+        //function:用ID檢查產品是否存在於資料庫中
+        private bool ProductExists(int id)
+        {
+            return _context.Products.Any(e => e.Id == id);
         }
     }
 }
