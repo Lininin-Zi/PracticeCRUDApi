@@ -70,7 +70,7 @@ namespace PracticeCRUDApi.Controllers
             //檢查資料庫中是否有此ID的產品
             var existingProduct = await _context.Products.FindAsync(id);
 
-            //如果沒有找到就return NotFound
+            //如果沒有找到就return 404NotFound
             if (existingProduct == null)
             {
                 return NotFound();
@@ -94,7 +94,7 @@ namespace PracticeCRUDApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                // 檢查產品是否存在
+                // 檢查產品是否存在，若沒有就return 404NotFound
                 if (!ProductExists(id))
                 {
                     return NotFound();
@@ -112,9 +112,25 @@ namespace PracticeCRUDApi.Controllers
 
         // DELETE api/<ProductsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<Product>> DeleteProduct(int id)
         {
+            //檢查資料庫中是否有此ID的產品
+            var existingProduct = await _context.Products.FindAsync(id);
 
+            //如果沒有找到就return 404NotFound
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            //將產品資料從資料庫物件list中刪除
+            _context.Products.Remove(existingProduct);
+            //更新至資料庫
+            await _context.SaveChangesAsync();
+
+
+            //return 204 no content訊息，不回傳內容
+            return NoContent();
         }
         
 
