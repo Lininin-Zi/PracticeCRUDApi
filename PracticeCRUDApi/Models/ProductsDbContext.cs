@@ -8,7 +8,9 @@ namespace PracticeCRUDApi.Models
             : base(options)
         {
         }
-        public DbSet<Product> Products { get; set; } = null!;
+        public DbSet<Product> Products { get; set; } = null!;//產品資料表DbSet
+
+        public virtual DbSet<User> Users { get; set; }//使用者資料表DbSet
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
