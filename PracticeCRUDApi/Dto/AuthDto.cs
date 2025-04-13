@@ -26,4 +26,10 @@ namespace PracticeCRUDApi.Dto
         [StringLength(100, MinimumLength = 6)]
         public required string Password { get; set; }
     }
+
+    public class UpdateUserDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string? NewPassword { get; set; }  // 可選填
+    }
 }

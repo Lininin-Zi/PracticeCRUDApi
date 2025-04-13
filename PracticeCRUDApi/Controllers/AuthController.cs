@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -68,6 +69,7 @@ namespace PracticeCRUDApi.Controllers
             return Ok("Register");
         }
 
+
         // POST api/<AuthController>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto logindto)
@@ -94,17 +96,64 @@ namespace PracticeCRUDApi.Controllers
             return Ok(new {token});
         }
 
-
-        // POST api/<AuthController>
-        [HttpPost]
-        public void Post([FromBody]string value)
+        [Authorize]
+        // GET api/<AuthController>
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyInfo()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("Token does not contain a valid user ID.");
+            }
+
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return BadRequest("Invalid user ID format.");
+            }
+
+            //從資料庫撈該使用者的資料
+            var user = await _context.Users.FindAsync(userId);
+
+            //若找不到，回傳 404
+            if (user == null)
+                return NotFound();
+
+            //回傳資料，避免包含敏感資訊（像密碼）
+            return Ok(new
+            {
+                user.Id,
+                user.Username,
+                user.Email
+            });
         }
 
-        // PUT api/<AuthController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [Authorize]
+        [HttpPut("me")]
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] UpdateUserDto updateuserdto)
         {
+            //從 Token 取出 UserId
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            //從資料庫撈出該會員資料
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            //更新 Email
+            user.Email = updateuserdto.Email;
+
+            //若有輸入新密碼，就進行加密更新
+            if (!string.IsNullOrEmpty(updateuserdto.NewPassword))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateuserdto.NewPassword);
+            }
+
+            //存回資料庫
+            await _context.SaveChangesAsync();
+
+            //回傳 204NoContent 代表成功但無內容回應
+            return NoContent();
         }
 
         // DELETE api/<AuthController>/5
@@ -121,9 +170,10 @@ namespace PracticeCRUDApi.Controllers
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email),
-        };
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email),
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
