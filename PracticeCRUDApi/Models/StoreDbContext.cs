@@ -15,6 +15,7 @@ public partial class StoreDbContext : DbContext
     {
     }
 
+    /*
     public virtual DbSet<LoginHistory> LoginHistories { get; set; }
 
     public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
@@ -148,4 +149,5 @@ public partial class StoreDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    */
 }

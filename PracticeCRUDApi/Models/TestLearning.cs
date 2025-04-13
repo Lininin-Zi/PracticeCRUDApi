@@ -5,6 +5,7 @@ namespace PracticeCRUDApi.Models;
 
 public partial class TestLearning
 {
+    /*
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
@@ -20,4 +21,5 @@ public partial class TestLearning
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+    */
 }

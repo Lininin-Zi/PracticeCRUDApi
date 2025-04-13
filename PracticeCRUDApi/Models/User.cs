@@ -15,12 +15,17 @@ public partial class User
 
     public string PasswordSalt { get; set; } = null!;
 
+    public DateTime CreatedAt { get; set; }
+
+    /*
+    
+
     
     public string? PhoneNumber { get; set; }
 
     public string? Address { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    
 
     public DateTime? LastLoginAt { get; set; }
 
@@ -31,5 +36,5 @@ public partial class User
     public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    
+    */
 }

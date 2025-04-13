@@ -95,7 +95,7 @@ namespace PracticeCRUDApi.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 // 檢查產品是否存在，若沒有就return 404NotFound
-                if (!ProductExists(id))
+                if (!IsProductExists(id))
                 {
                     return NotFound();
                 }
@@ -139,7 +139,7 @@ namespace PracticeCRUDApi.Controllers
 
         
         //function:用ID檢查產品是否存在於資料庫中
-        private bool ProductExists(int id)
+        private bool IsProductExists(int id)
         {
             return _context.Products.Any(e => e.Id == id);
         }
