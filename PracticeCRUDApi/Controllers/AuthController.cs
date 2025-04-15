@@ -19,13 +19,13 @@ namespace PracticeCRUDApi.Controllers
     public class AuthController : ControllerBase
     {
 
-        // 🔹 注入資料庫上下文 AppDbContext
+        //注入資料庫上下文 AppDbContext
         private readonly ProductsDbContext _context;
 
-        // 🔹 注入 IConfiguration 來存取 appsettings.json 中的設定（如 JWT secret）
+        //注入 IConfiguration 來存取 appsettings.json中的設定(JWT）
         private readonly IConfiguration _configuration;
 
-        // 🔹 透過建構子注入這兩個服務
+        //透過建構子依賴注入
         public AuthController(ProductsDbContext context, IConfiguration configuration)
         {
             _context = context;
