@@ -43,3 +43,14 @@
 會員登入 | POST | /api/auth/login | 會員登入並取得 JWT Token | 否
 取得目前會員資訊 | GET | /api/auth/me | 查看登入中的會員資料 | ✅
 修改會員資訊 | PUT | /api/auth/me | 修改登入中的會員 Email/密碼 | ✅
+
+## TODO LIST
+
+- 購物車系統
+- 訂單系統
+- 商品分類搜尋
+- 前端介面
+- 第三方API串接
+- 安全性功能
+- 單元測試
+- 性能優化
